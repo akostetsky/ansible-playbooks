@@ -5,11 +5,11 @@
   tasks:
     - name: "Set hostname"
       hostname:
-      name: ha
+        name: ha
       
     - name: Set timezone to Europe/Moscow
       timezone:
-      name: Europe/Moscow
+        name: Europe/Moscow
       
     - name: Update apt
       apt: update_cache=yes state=latest
