@@ -1,0 +1,46 @@
+---
+- hosts: 127.0.0.1
+  become: true
+
+  tasks:
+    - name: Update apt
+      apt: update_cache=yes
+
+    - name: Install required system packages
+      apt: name={{ item }} state=latest update_cache=yes
+      loop: ['docker.io', 'python3-docker', 'htop', 'mc', 'tmux' ]
+
+    - name: Mount up device by label
+      mount:
+        path: /mnt/usb
+        src: LABEL=usb
+        fstype: xfs
+        state: present
+
+    - name: Create container home-assistant
+      docker_container:
+        name: "home-assistant"
+        image: "homeassistant/home-assistant:stable"
+        detach: True
+        network_mode: "host"
+        volumes:
+          - /etc/localtime:/etc/localtime:ro
+          - /mnt/usb/ha:/config
+        restart_policy: always
+        state: started
+
+    - name: Create container deconz
+      docker_container:
+        name: "deconz"
+        image: "marthoc/deconz"
+        detach: True
+        network_mode: "host"
+        volumes:
+          - "/etc/localtime:/etc/localtime:ro"
+          - "/mnt/usb/deCONZ:/root/.local/share/dresden-elektronik/deCONZ"
+        devices:
+          - "/dev/ttyACM0"
+        env:
+          DECONZ_DEVICE: "/dev/ttyACM0"
+        restart_policy: "always"
+        state: "started"
