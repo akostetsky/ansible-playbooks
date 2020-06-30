@@ -3,12 +3,20 @@
   become: true
 
   tasks:
+    - name: "Set hostname"
+      hostname:
+      name: ha
+      
+    - name: Set timezone to Europe/Moscow
+      timezone:
+      name: Europe/Moscow
+      
     - name: Update apt
-      apt: update_cache=yes
+      apt: update_cache=yes state=latest
 
     - name: Install required system packages
-      apt: name={{ item }} state=latest update_cache=yes
-      loop: ['docker.io', 'python3-docker', 'htop', 'mc', 'tmux' ]
+      apt: name={{ item }}
+      loop: ['docker.io', 'python3-docker', 'htop', 'mc', 'tmux', 'avahi-daemon' ]
 
     - name: Mount up device by label
       mount:
